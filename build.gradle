@@ -1,0 +1,55 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.22'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.22'
+}
+
+group = 'xyz.malkki'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/mjaakko/gtfs-library")
+        credentials {
+            username = project.findProperty("gpr.user") as String ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") as String ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-graphql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation "com.github.ben-manes.caffeine:caffeine:3.1.6"
+
+    implementation 'io.github.oshai:kotlin-logging-jvm:4.0.1'
+
+    implementation "org.mobilitydata:gtfs-realtime-bindings:0.0.8"
+    implementation "xyz.malkki:gtfs-library:0.2.1"
+
+    implementation "com.eatthepath:jvptree:0.3.0"
+}
+
+tasks.withType(KotlinCompile) {
+    kotlinOptions {
+        freeCompilerArgs += '-Xjsr305=strict'
+        jvmTarget = '17'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
