@@ -31,16 +31,13 @@ fun encodePolyline(points: List<LatLng>): String {
 
     return pointsE5
         .mapIndexed { index, point ->
-            println("Encoding $index")
             val prev = if (index > 0) {
                 pointsE5[index-1]
             } else {
                 0.0 to 0.0
             }
 
-            val encoded = "${encodeSignedNumber((point.first - prev.first).toInt())}${encodeSignedNumber((point.second - prev.second).toInt())}"
-            println("Encoded to ${encoded}")
-            encoded
+            "${encodeSignedNumber((point.first - prev.first).toInt())}${encodeSignedNumber((point.second - prev.second).toInt())}"
         }
         .joinToString("")
 }
