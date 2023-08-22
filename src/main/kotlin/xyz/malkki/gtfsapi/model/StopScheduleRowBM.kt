@@ -8,5 +8,7 @@ data class StopScheduleRowBM(
     val tripDate: LocalDate,
     val headsign: String?,
     val arrivalTimeScheduled: OffsetDateTime?,
-    val departureTimeScheduled: OffsetDateTime?
+    val departureTimeScheduled: OffsetDateTime?,
+    val dropOff: Boolean,
+    val pickUp: Boolean,
 )
