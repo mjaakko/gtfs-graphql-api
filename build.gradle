@@ -37,7 +37,7 @@ dependencies {
     implementation 'io.github.oshai:kotlin-logging-jvm:4.0.1'
 
     implementation "org.mobilitydata:gtfs-realtime-bindings:0.0.8"
-    implementation "xyz.malkki:gtfs-library:0.2.1"
+    implementation "xyz.malkki:gtfs-library:0.2.2"
 
     implementation "com.eatthepath:jvptree:0.3.0"
 }
