@@ -1,0 +1,93 @@
+type Query {
+    stops: [Stop!]!
+    stop(id: String!): Stop
+    stopsNearby(latitude: Float!, longitude: Float!, radius: Float!): [Stop!]!
+    trip(id: String!, date: Date!): TripInstance
+    routes: [Route!]!
+}
+
+type Subscription {
+    vehiclePositions: [VehiclePosition!]!
+}
+
+# Date in format yyyy-MM-dd
+scalar Date
+
+# Timestamp with timezone in ISO-8601 format
+scalar Timestamp
+
+# Describes a type that can have a location. Coordinates can be null if the location is unknown
+interface Location {
+    latitude: Float
+    longitude: Float
+}
+
+type Route {
+    routeId: String!
+    shortName: String
+    longName: String
+    trips(from: Date, to: Date): [TripInstance!]!
+}
+
+type TripInstance {
+    tripId: String!
+    date: Date!
+    route: Route!
+    headsign: String
+    scheduleRows: [TripScheduleRow!]!
+    vehiclePosition: VehiclePosition
+    shape: String
+}
+
+interface ScheduleRow {
+    headsign: String
+    arrivalTimeScheduled: Timestamp
+    departureTimeScheduled: Timestamp
+    dropOff: Boolean!
+    pickUp: Boolean!
+}
+
+type TripScheduleRow implements ScheduleRow {
+    sequenceNumber: Int!
+    stop: Stop!
+    headsign: String
+    arrivalTimeScheduled: Timestamp
+    departureTimeScheduled: Timestamp
+    dropOff: Boolean!
+    pickUp: Boolean!
+}
+
+type Stop implements Location {
+    stopId: String!
+    name: String
+    latitude: Float
+    longitude: Float
+    timezone: String
+    scheduleRows(max: Int): [StopScheduleRow!]!
+}
+
+type StopScheduleRow implements ScheduleRow {
+    trip: TripInstance!
+    headsign: String
+    arrivalTimeScheduled: Timestamp
+    departureTimeScheduled: Timestamp
+    dropOff: Boolean!
+    pickUp: Boolean!
+}
+
+type VehiclePosition implements Location {
+    trip: TripInstance!
+    vehicleId: String!
+    vehicleLabel: String
+    latitude: Float!
+    longitude: Float!
+    bearing: Float
+    speed: Float
+    status: VehicleStopStatus
+    currentStop: TripScheduleRow
+    timestamp: Timestamp
+}
+
+enum VehicleStopStatus {
+    IN_TRANSIT_TO, STOPPED_AT, INCOMING_AT
+}
