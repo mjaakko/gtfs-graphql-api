@@ -8,6 +8,7 @@ import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import xyz.malkki.gtfsapi.common.LatLng
+import xyz.malkki.gtfsapi.model.AgencyBM
 import xyz.malkki.gtfsapi.model.RouteBM
 import xyz.malkki.gtfsapi.model.StopBM
 import xyz.malkki.gtfsapi.model.StopScheduleRowBM
@@ -47,6 +48,28 @@ class GtfsController(@Autowired private val gtfsService: GtfsService, @Autowired
     @QueryMapping
     fun trip(@Argument id: String, @Argument date: LocalDate): TripInstanceBM? {
         return gtfsService.getTripInstance(id, date)
+    }
+
+    @QueryMapping
+    fun agencies(): List<AgencyBM> {
+        return gtfsService.getAgencies()
+    }
+
+    @SchemaMapping(typeName = "Agency", field = "routes")
+    fun agencyRoutes(agency: AgencyBM): List<RouteBM> {
+        return gtfsService.getRoutes().filter { it.agencyId == agency.agencyId }
+    }
+
+    @SchemaMapping(typeName = "Route", field = "agency")
+    fun routeAgency(route: RouteBM): AgencyBM? {
+        return if (route.agencyId != null) {
+            gtfsService.getAgency(route.agencyId)
+        } else if (gtfsService.getAgencies().size == 1) {
+            //If there is only one agency, agency ID is optional
+            gtfsService.getAgencies().first()
+        } else {
+            null
+        }
     }
 
     @SchemaMapping(typeName = "Route", field = "trips")

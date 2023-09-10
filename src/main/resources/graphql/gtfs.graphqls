@@ -1,4 +1,5 @@
 type Query {
+    agencies: [Agency!]!
     stops: [Stop!]!
     stop(id: String!): Stop
     stopsNearby(latitude: Float!, longitude: Float!, radius: Float!): [Stop!]!
@@ -22,10 +23,23 @@ interface Location {
     longitude: Float
 }
 
+type Agency {
+    agencyId: String!
+    name: String!
+    url: String!
+    timezone: String!
+    lang: String
+    phone: String
+    fareUrl: String
+    email: String
+    routes: [Route!]!
+}
+
 type Route {
     routeId: String!
     shortName: String
     longName: String
+    agency: Agency
     trips(from: Date, to: Date): [TripInstance!]!
 }
 

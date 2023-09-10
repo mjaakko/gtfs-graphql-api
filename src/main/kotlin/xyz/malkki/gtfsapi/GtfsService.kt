@@ -3,6 +3,7 @@ package xyz.malkki.gtfsapi
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import xyz.malkki.gtfs.model.Agency
 import xyz.malkki.gtfs.model.Stop
 import xyz.malkki.gtfs.model.StopTime
 import xyz.malkki.gtfs.utils.GtfsTimeUtils
@@ -11,6 +12,7 @@ import xyz.malkki.gtfsapi.extensions.hasDropOff
 import xyz.malkki.gtfsapi.extensions.hasPickUp
 import xyz.malkki.gtfsapi.extensions.location
 import xyz.malkki.gtfsapi.gtfs.GtfsIndex
+import xyz.malkki.gtfsapi.model.AgencyBM
 import xyz.malkki.gtfsapi.model.RouteBM
 import xyz.malkki.gtfsapi.model.StopBM
 import xyz.malkki.gtfsapi.model.StopScheduleRowBM
@@ -46,7 +48,8 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
             RouteBM(
                 it.routeId,
                 it.routeShortName,
-                it.routeLongName
+                it.routeLongName,
+                it.agencyId
             )
         }
     }
@@ -56,9 +59,18 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
             RouteBM(
                 it.routeId,
                 it.routeShortName,
-                it.routeLongName
+                it.routeLongName,
+                it.agencyId
             )
         }
+    }
+
+    fun getAgencies(): List<AgencyBM> {
+        return gtfsIndex.agenciesById.values.map { it.toBM() }
+    }
+
+    fun getAgency(agencyId: String): AgencyBM? {
+        return gtfsIndex.agenciesById[agencyId]?.toBM()
     }
 
     fun getTripInstancesForRoute(routeId: String, from: LocalDate?, to: LocalDate?): List<TripInstanceBM> {
@@ -254,6 +266,19 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
             stopLat,
             stopLon,
             stopTimezone
+        )
+    }
+
+    private fun Agency.toBM(): AgencyBM {
+        return AgencyBM(
+            agencyId,
+            agencyName,
+            agencyUrl,
+            agencyTimezone.id,
+            agencyLang,
+            agencyPhone,
+            agencyFareUrl,
+            agencyEmail
         )
     }
 }
