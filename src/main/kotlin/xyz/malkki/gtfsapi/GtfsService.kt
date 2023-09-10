@@ -11,7 +11,11 @@ import xyz.malkki.gtfsapi.extensions.hasDropOff
 import xyz.malkki.gtfsapi.extensions.hasPickUp
 import xyz.malkki.gtfsapi.extensions.location
 import xyz.malkki.gtfsapi.gtfs.GtfsIndex
-import xyz.malkki.gtfsapi.model.*
+import xyz.malkki.gtfsapi.model.RouteBM
+import xyz.malkki.gtfsapi.model.StopBM
+import xyz.malkki.gtfsapi.model.StopScheduleRowBM
+import xyz.malkki.gtfsapi.model.TripInstanceBM
+import xyz.malkki.gtfsapi.model.TripScheduleRowBM
 import xyz.malkki.gtfsapi.utils.encodePolyline
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -172,7 +176,19 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
     private val StopTime.agencyTimezone: ZoneId
         get() = gtfsIndex.agenciesById[gtfsIndex.routesById[gtfsIndex.tripsById[this.tripId]!!.routeId]!!.agencyId]!!.agencyTimezone
 
-    fun getNextDeparturesFromStop(stopId: String, from: ZonedDateTime, to: ZonedDateTime, max: Int? = null): List<StopScheduleRowBM> {
+    /**
+     * Gets schedule rows for the stop
+     *
+     * @param max Maximum number of rows to return
+     * @param includeLastStop Whether to include schedule rows where this stop is the final stop of a trip
+     */
+    fun getScheduleRowsForStop(
+        stopId: String,
+        from: ZonedDateTime,
+        to: ZonedDateTime,
+        max: Int? = null,
+        includeLastStop: Boolean = true
+    ): List<StopScheduleRowBM> {
         val stop = gtfsIndex.stopsById[stopId] ?: return emptyList()
         val stopTimes = gtfsIndex.stopTimesByStopId[stop.stopId] ?: return emptyList()
 
@@ -191,6 +207,7 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
         val maxServiceDay = findLatestServiceDay(to, stopTimeWithMinArrivalTime.agencyTimezone, stopTimeWithMinArrivalTime.arrivalTime!!)
 
         val scheduleRows = stopTimes
+            .filter { stopTime -> includeLastStop || !stopTime.isLastStop }
             .flatMap { stopTime ->
                 val trip = gtfsIndex.tripsById[stopTime.tripId]!!
 
@@ -223,6 +240,12 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
             scheduleRows
         }
     }
+
+    /**
+     * Whether this StopTime is the last stop of the trip
+     */
+    private val StopTime.isLastStop: Boolean
+        get() = gtfsIndex.stopTimesByTripId[tripId]?.last() == this
 
     private fun Stop.toBM(): StopBM {
         return StopBM(

@@ -102,16 +102,10 @@ class GtfsController(@Autowired private val gtfsService: GtfsService, @Autowired
     }
 
     @SchemaMapping(typeName = "Stop", field = "scheduleRows")
-    fun stopScheduleRows(stop: StopBM, @Argument max: Int?): List<StopScheduleRowBM> {
+    fun stopScheduleRows(stop: StopBM, @Argument max: Int?, @Argument includeLastStop: Boolean?): List<StopScheduleRowBM> {
         val now = ZonedDateTime.now()
 
-        val scheduleRows = gtfsService.getNextDeparturesFromStop(stop.stopId, now, now.plusDays(1))
-
-        return if (max != null) {
-            scheduleRows.take(max)
-        } else {
-            scheduleRows
-        }
+        return gtfsService.getScheduleRowsForStop(stop.stopId, now, now.plusDays(1), max = max, includeLastStop = includeLastStop ?: true)
     }
 
     @SchemaMapping(typeName = "StopScheduleRow", field = "trip")

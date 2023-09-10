@@ -63,7 +63,7 @@ type Stop implements Location {
     latitude: Float
     longitude: Float
     timezone: String
-    scheduleRows(max: Int): [StopScheduleRow!]!
+    scheduleRows(max: Int, includeLastStop: Boolean): [StopScheduleRow!]!
 }
 
 type StopScheduleRow implements ScheduleRow {
