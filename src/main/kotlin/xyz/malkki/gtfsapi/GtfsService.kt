@@ -240,9 +240,12 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
                 }
             }
             .filter {
-                it.arrivalTimeScheduled != null
+                (it.arrivalTimeScheduled != null
                         && it.arrivalTimeScheduled >= from.toOffsetDateTime()
-                        && it.arrivalTimeScheduled <= to.toOffsetDateTime()
+                        && it.arrivalTimeScheduled <= to.toOffsetDateTime())
+                || (it.departureTimeScheduled != null
+                        && it.departureTimeScheduled >= from.toOffsetDateTime()
+                        && it.departureTimeScheduled <= to.toOffsetDateTime())
             }
             .sortedBy { it.arrivalTimeScheduled }
 
