@@ -3,7 +3,6 @@ package xyz.malkki.gtfsapi.gtfs
 import com.github.benmanes.caffeine.cache.Caffeine
 import xyz.malkki.gtfs.model.Calendar
 import xyz.malkki.gtfs.model.CalendarDate
-import xyz.malkki.gtfsapi.common.DateSet
 import java.time.LocalDate
 import java.util.*
 
@@ -12,12 +11,12 @@ class ServiceDates(calendars: Collection<Calendar>, calendarDates: Collection<Ca
     private val calendarDatesByServiceId = calendarDates.groupBy { it.serviceId }
 
     private val dateSetCache = Caffeine.newBuilder()
-        .maximumWeight(15 * 1024 * 1024 * 8) //15MB
+        /*.maximumWeight(15 * 1024 * 1024 * 8) //15MB
         .weigher { _: String, set: DateSet ->
             set.bitSize
-        }
-        .build<String, DateSet> { serviceId ->
-            DateSet(getDatesForService(serviceId))
+        }*/
+        .build<String, NavigableSet<LocalDate>> { serviceId ->
+            TreeSet(getDatesForService(serviceId))
         }
 
     private fun getDatesForService(serviceId: String): Collection<LocalDate> {
