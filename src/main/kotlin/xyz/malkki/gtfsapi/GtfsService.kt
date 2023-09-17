@@ -115,6 +115,10 @@ class GtfsService(@Autowired private val gtfsIndexProvider: GtfsIndexProvider) {
         )
     }
 
+    fun getTripId(routeId: String, startTime: Int, date: LocalDate, directionId: Int?): String? {
+        return gtfsIndex.getTripId(routeId, startTime, date, directionId)
+    }
+
     fun getStopsNearby(location: LatLng, radius: Double): List<StopBM> {
         return gtfsIndex.getStopsNearLocation(location, radius)
             .filter { it.locationType == null || it.locationType == Stop.LOCATION_TYPE_STOP }

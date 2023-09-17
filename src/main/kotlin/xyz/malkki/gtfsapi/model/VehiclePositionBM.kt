@@ -4,7 +4,10 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 
 data class VehiclePositionBM(
-    val tripId: String,
+    val tripId: String?,
+    val routeId: String?,
+    val startTime: Int?,
+    val directionId: Int?,
     val tripDate: LocalDate,
     val vehicleId: String,
     val vehicleLabel: String?,

@@ -101,12 +101,18 @@ class GtfsController(@Autowired private val gtfsService: GtfsService, @Autowired
 
     @SchemaMapping(typeName = "VehiclePosition", field = "trip")
     fun vehiclePositionTrip(vehiclePosition: VehiclePositionBM): TripInstanceBM? {
-        return gtfsService.getTripInstance(vehiclePosition.tripId, vehiclePosition.tripDate)
+        return vehiclePosition.getTripId()?.let { tripId -> gtfsService.getTripInstance(tripId, vehiclePosition.tripDate) }
     }
 
     @SchemaMapping(typeName = "VehiclePosition", field = "currentStop")
     fun vehiclePositionCurrentStop(vehiclePosition: VehiclePositionBM): TripScheduleRowBM? {
-        val scheduleRows = gtfsService.getTripScheduleRows(vehiclePosition.tripId, vehiclePosition.tripDate)
+        val scheduleRows = vehiclePosition.getTripId()?.let { tripId ->
+            gtfsService.getTripScheduleRows(tripId, vehiclePosition.tripDate)
+        }
+
+        if (scheduleRows.isNullOrEmpty()) {
+            return null
+        }
 
         val byStopSequence = if (vehiclePosition.currentStopSequence != null) {
             scheduleRows.find { it.sequenceNumber == vehiclePosition.currentStopSequence }
@@ -139,5 +145,14 @@ class GtfsController(@Autowired private val gtfsService: GtfsService, @Autowired
     @SubscriptionMapping
     fun vehiclePositions(): Flux<List<VehiclePositionBM>> {
         return gtfsRtService.getVehiclePositionFlux()
+    }
+
+    private fun VehiclePositionBM.getTripId(): String? {
+        return tripId ?:
+            if (routeId != null && startTime != null) {
+                gtfsService.getTripId(routeId, startTime, tripDate, directionId)
+            } else {
+                null
+            }
     }
 }

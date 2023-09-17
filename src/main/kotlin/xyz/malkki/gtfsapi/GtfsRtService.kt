@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import xyz.malkki.gtfs.utils.GtfsDateFormat
+import xyz.malkki.gtfs.utils.GtfsTimeFormat
 import xyz.malkki.gtfsapi.model.VehiclePositionBM
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -43,7 +44,10 @@ class GtfsRtService(@Autowired private val vehiclePositionService: VehiclePositi
 
     private fun mapToBM(vehiclePosition: VehiclePosition): VehiclePositionBM {
         return VehiclePositionBM(
-            vehiclePosition.trip.tripId,
+            vehiclePosition.trip.tripId.takeIf { vehiclePosition.trip.hasTripId() },
+            vehiclePosition.trip.routeId.takeIf { vehiclePosition.trip.hasRouteId() },
+            vehiclePosition.trip.startTime.takeIf { vehiclePosition.trip.hasStartTime() }?.let { GtfsTimeFormat.parseFromString(it) },
+            vehiclePosition.trip.directionId.takeIf { vehiclePosition.trip.hasDirectionId() },
             GtfsDateFormat.parseFromString(vehiclePosition.trip.startDate),
             vehiclePosition.vehicle.id,
             vehiclePosition.vehicle.label.takeIf { vehiclePosition.vehicle.hasLabel() },
