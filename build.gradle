@@ -5,10 +5,13 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.8.22'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.8.22'
+    id 'com.google.cloud.tools.jib' version '3.3.2'
 }
 
 group = 'xyz.malkki'
 version = '1.0-SNAPSHOT'
+
+var mainClassName = "xyz.malkki.gtfsapi.MainKt"
 
 java {
     sourceCompatibility = '17'
@@ -40,6 +43,27 @@ dependencies {
     implementation "xyz.malkki:gtfs-library:0.2.2"
 
     implementation "com.eatthepath:jvptree:0.3.0"
+}
+
+jib {
+    container {
+        mainClass = mainClassName
+    }
+    from {
+        platforms {
+            platform {
+                architecture = "amd64"
+                os = "linux"
+            }
+            platform {
+                architecture = "arm64"
+                os = "linux"
+            }
+        }
+    }
+    to {
+        image = "mjaakko/gtfs-graphql-api:edge"
+    }
 }
 
 tasks.withType(KotlinCompile) {
