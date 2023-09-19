@@ -11,7 +11,7 @@ plugins {
 group = 'xyz.malkki'
 version = '1.0-SNAPSHOT'
 
-var mainClassName = "xyz.malkki.gtfsapi.MainKt"
+var mainClassName = "xyz.malkki.gtfsapi.GtfsApiApplicationKt"
 
 java {
     sourceCompatibility = '17'
