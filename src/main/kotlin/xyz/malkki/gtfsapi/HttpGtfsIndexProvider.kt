@@ -4,7 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.stereotype.Component
 import xyz.malkki.gtfs.serialization.parser.ZipGtfsFeedParser
 import xyz.malkki.gtfsapi.extensions.isSuccessful
@@ -27,7 +27,7 @@ import kotlin.time.toKotlinDuration
 private val log = KotlinLogging.logger {  }
 
 @Component
-@ConditionalOnProperty(name = ["gtfs.feed.url"])
+@ConditionalOnExpression("'\${gtfs.feed.url}' != null && !'\${gtfs.feed.url}'.isBlank()")
 class HttpGtfsIndexProvider(
     @Autowired private val httpClient: HttpClient,
     @Value("\${gtfs.feed.url}") private val gtfsUrlString: String,

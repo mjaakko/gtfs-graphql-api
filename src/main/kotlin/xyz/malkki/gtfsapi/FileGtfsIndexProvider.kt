@@ -2,7 +2,7 @@ package xyz.malkki.gtfsapi
 
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.stereotype.Component
 import xyz.malkki.gtfs.serialization.parser.ZipGtfsFeedParser
 import xyz.malkki.gtfsapi.extensions.debounce
@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 
 @Component
-@ConditionalOnProperty(name = ["gtfs.feed.path"])
+@ConditionalOnExpression("'\${gtfs.feed.path}' != null && !'\${gtfs.feed.path}'.isBlank()")
 class FileGtfsIndexProvider(@Value("\${gtfs.feed.path}") gtfsPathString: String) : GtfsIndexProvider {
     private val gtfsPath = Paths.get(gtfsPathString)
 
