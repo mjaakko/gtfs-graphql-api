@@ -9,3 +9,7 @@ Docker image is available from [DockerHub](https://hub.docker.com/r/mjaakko/gtfs
 
 * `GTFSRT_VEHICLE_POSITION_URL`: URL to the vehicle position feed
 * `GTFS_PATH`: Path to the GTFS file
+* `GTFS_URL`: URL to the GTFS feed
+* `GTFS_UPDATE_INTERVAL`: interval how often to update the GTFS feed from the URL
+
+Only `GTFS_PATH` or `GTFS_URL` can be used at the same time
