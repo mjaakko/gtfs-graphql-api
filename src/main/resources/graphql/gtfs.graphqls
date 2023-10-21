@@ -9,6 +9,9 @@ type Query {
 
 type Subscription {
     vehiclePositions: [VehiclePosition!]!
+    vehiclePosition(vehicleId: String!): VehiclePosition
+    # IDs of the vehicles currently operating
+    vehicleIds: [String!]!
 }
 
 # Date in format yyyy-MM-dd

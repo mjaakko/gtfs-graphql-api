@@ -147,6 +147,23 @@ class GtfsController(@Autowired private val gtfsService: GtfsService, @Autowired
         return gtfsRtService.getVehiclePositionFlux()
     }
 
+    @SubscriptionMapping
+    fun vehiclePosition(@Argument vehicleId: String): Flux<VehiclePositionBM?> {
+        return gtfsRtService.getVehiclePositionFlux()
+            .map {
+                it.find { vehiclePositionBM ->
+                    vehiclePositionBM.vehicleId == vehicleId
+                }
+            }
+    }
+
+    @SubscriptionMapping
+    fun vehicleIds(): Flux<Set<String>> {
+        return gtfsRtService.getVehiclePositionFlux()
+            .map { it.map { it.vehicleId }.toSet() }
+            .distinctUntilChanged()
+    }
+
     private fun VehiclePositionBM.getTripId(): String? {
         return tripId ?:
             if (routeId != null && startTime != null) {
