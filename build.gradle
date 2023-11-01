@@ -37,7 +37,7 @@ dependencies {
 
     implementation "com.github.ben-manes.caffeine:caffeine:3.1.8"
 
-    implementation 'io.github.oshai:kotlin-logging-jvm:4.0.1'
+    implementation 'io.github.oshai:kotlin-logging-jvm:5.1.0'
 
     implementation "org.mobilitydata:gtfs-realtime-bindings:0.0.8"
     implementation "xyz.malkki:gtfs-library:0.2.2"
