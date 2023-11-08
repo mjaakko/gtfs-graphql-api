@@ -5,13 +5,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.stereotype.Component
 import xyz.malkki.gtfs.serialization.parser.ZipGtfsFeedParser
-import xyz.malkki.gtfsapi.extensions.debounce
 import xyz.malkki.gtfsapi.gtfs.GtfsIndex
-import xyz.malkki.gtfsapi.utils.watchFile
+import xyz.malkki.gtfsapi.utils.watchModifications
 import java.nio.file.Paths
-import java.nio.file.StandardWatchEventKinds
 import java.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 
 @Component
@@ -19,9 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class FileGtfsIndexProvider(@Value("\${gtfs.feed.path}") gtfsPathString: String) : GtfsIndexProvider {
     private val gtfsPath = Paths.get(gtfsPathString)
 
-    override val gtfsIndexFlux = gtfsPath.watchFile(StandardWatchEventKinds.ENTRY_MODIFY)
-        .debounce(500.milliseconds)
-        .map {  }
+    override val gtfsIndexFlux = gtfsPath.watchModifications(30.seconds)
         .startWith(Unit)
         .map {
             val gtfsParser = ZipGtfsFeedParser(gtfsPath)
